@@ -8,6 +8,15 @@ FigmaChain is a set of Python scripts that generate HTML/CSS code based on Figma
 - An OpenAI API key (set as environment variable `OPENAI_API_KEY`)
 - Access token, node IDs, and file key for Figma (set as environment variables `ACCESS_TOKEN`, `NODE_IDS`, and `FILE_KEY`)
 
+## Accessing the Figma RESTful API
+
+To access the Figma RESTful API, you will need an access token, node IDs, and a file key.
+
+- **File Key**: The file key can be pulled from the URL of the Figma design file. For example, the file key in the URL `https://www.figma.com/file/{filekey}/sampleFilename` is `{filekey}`.
+- **Node IDs**: Node IDs are also available in the URL. Click on any element in the Figma design file and look for the `?node-id={node_id}` parameter in the URL.
+- **Access Token**: Instructions for obtaining an access token can be found in the Figma help center article: https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens
+
+
 ## Installation
 
 1. Clone the repository to your local machine.
