@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Register</title>
+	<link href="https://fonts.googleapis.com/css?family=Comfortaa|Roboto&display=swap" rel="stylesheet">
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: 'Roboto', sans-serif;
+			background-color: #fff;
+		}
+		.container {
+			max-width: 375px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+		h1 {
+			font-family: 'Comfortaa', cursive;
+			font-size: 36px;
+			font-weight: 400;
+			text-align: center;
+			margin-bottom: 30px;
+			color: #000;
+		}
+		form {
+			background-color: #f2f2f2;
+			padding: 20px;
+			border-radius: 10px;
+			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+		}
+		label {
+			display: block;
+			font-size: 15px;
+			font-weight: 400;
+			margin-bottom: 5px;
+			color: rgba(0, 0, 0, 0.5);
+		}
+		input[type="email"], input[type="password"], input[type="text"] {
+			display: block;
+			width: 100%;
+			padding: 10px;
+			border: none;
+			border-radius: 5px;
+			margin-bottom: 20px;
+			background-color: #fff;
+			box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+		}
+		input[type="submit"] {
+			display: block;
+			width: 100%;
+			padding: 10px;
+			border: none;
+			border-radius: 5px;
+			background-color: #ff69b4;
+			color: #fff;
+			font-size: 15px;
+			font-weight: 400;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
+		input[type="submit"]:hover {
+			background-color: #ff1493;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Register</h1>
+		<form>
+			<label for="email">Email address</label>
+			<input type="email" id="email" name="email" required>
+			<label for="password">Create password</label>
+			<input type="password" id="password" name="password" required>
+			<input type="submit" value="Register">
+		</form>
+	</div>
+</body>
+</html>
