@@ -1,0 +1,7 @@
+openai==0.27.4
+openapi-schema-pydantic===1.2.4
+streamlit==1.22.0
+python-dotenv==1.0.0
+streamlit_chat==0.0.2.2
+langchain==0.0.150
+
