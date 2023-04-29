@@ -1,82 +1,126 @@
 import os
-import webbrowser
-import argparse
-from langchain.document_loaders.figma import FigmaFileLoader
-from langchain.chat_models import ChatOpenAI
-from langchain.indexes import VectorstoreIndexCreator
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-)
+import re
+import openai
+import streamlit as st
 from dotenv import load_dotenv
+from tempfile import NamedTemporaryFile
+import streamlit.components.v1 as components
+from streamlit_chat import message
+from langchain import LLMChain, PromptTemplate
+from langchain.memory import ConversationBufferWindowMemory
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.chat_models import ChatOpenAI
 
-# Load environment variables
+# Load environment variables from a .env file (containing OPENAI_API_KEY)
 load_dotenv()
 
-# Initialize the FigmaFileLoader with environment variables
-figma_loader = FigmaFileLoader(
-    os.environ.get('ACCESS_TOKEN'),
-    os.environ.get('NODE_IDS'),
-    os.environ.get('FILE_KEY'),
+# Set the OpenAI API key and dataset path from the environment variables
+openai.api_key = os.environ.get('OPENAI_API_KEY')
+
+# Define the file name of the HTML file to read and the updated file name
+file_name = "output.html"
+updated_file_name = "output_updated.html"
+
+st.title('FigmaChain')
+
+# Define the chatbot template
+template = """Assistant is a senior developer. Assistant only writes new code and does not write additional text.
+Assistant is designed to assist with front-end development incorporating modern design principles such as responsive design.
+Assistant is constantly learning and improving, and its capabilities are constantly evolving. It is able to process and understand large amounts of code, and can use this knowledge to provide accurate and informative coding updates.
+Overall, Assistant is a powerful tool that can help with a wide range of design and development tasks.
+{history}
+Human: {human_input}
+Assistant:"""
+
+# Define the chatbot prompt
+prompt = PromptTemplate(
+    input_variables=["history", "human_input"], 
+    template=template
 )
 
-# Create an index and retriever for Figma documents
-index = VectorstoreIndexCreator().from_loaders([figma_loader])
-figma_doc_retreiver = index.vectorstore.as_retriever()
+# Initialize the LLMChain for the chatbot
+chatgpt_chain = LLMChain(
+    llm=ChatOpenAI(temperature=0, request_timeout=120), 
+    prompt=prompt, 
+    verbose=True, 
+    memory=ConversationBufferWindowMemory(k=2),
+)
 
-# Define system and human prompt templates
-system_prompt_template = """You are a senior developer.
-Use the provided design context to create idiomatic HTML/CSS code based on the user request.
-Everything must be inline in one file and your response must be directly renderable by the browser.
-Write code that matches the Figma file nodes and metadata as exactly as you can.
-Figma file nodes and metadata: {context}"""
+# Function to read the HTML content from the specified file
+def read_html_content(file_name):
+    with open(file_name, "r") as file:
+        html_content = file.read()
+    return html_content
 
-human_prompt_template = "Code the {text}. Ensure that the code is mobile responsive and follows modern design principles."
+# Function to write the HTML content to the specified file
+def write_html_content(html_content):
+    with open(updated_file_name, "w") as file:
+        file.write(html_content)
 
-# Initialize the ChatOpenAI model
-gpt_4 = ChatOpenAI(temperature=.03, model_name='gpt-3.5-turbo', request_timeout=120)
+# Function to check if the output is a valid HTML/CSS code update
+def is_valid_html_css_code(output):
+    pattern = re.compile(r'<.*?>|{.*?}')
+    return bool(pattern.search(output))
 
-# Define a function to generate code based on the input
-def generate_code(input):
-    # Get relevant nodes from the Figma document retriever
-    relevant_nodes = figma_doc_retreiver.get_relevant_documents(input)
+# Function to generate a response using OpenAI's ChatCompletion API
+def generate_response(prompt, html_content):
+    completion = chatgpt_chain.predict(
+        human_input=(
+            "You are a senior developer. I want you to improve the following code with the following {prompt}: {html_content}. Only output new html/css code. Do not write additional text."
+            "The code is html/css that was created by AI based on a Figma document."
+        ).format(prompt=prompt, html_content=html_content)
+    )
+    return completion
 
-    # Create system and human message prompts
-    system_message_prompt = SystemMessagePromptTemplate.from_template(system_prompt_template)
-    human_message_prompt = HumanMessagePromptTemplate.from_template(human_prompt_template)
+# Function to render the HTML content using Streamlit's markdown function
+def render_html(html_content):
+    components.html(html_content, scrolling=True, height=300)
 
-    # Create the chat prompt using the system and human message prompts
-    conversation = [system_message_prompt, human_message_prompt]
-    chat_prompt = ChatPromptTemplate.from_messages(conversation)
-    response = gpt_4(chat_prompt.format_prompt(
-        context=relevant_nodes,
-        text=input).to_messages())
+# Function to get the user's input from the text input field
+def get_text():
+    # Create a Streamlit input field and return the user's input
+    input_text = st.text_input("", key="input")
+    return input_text
 
-    return response.content
+# Initialize the session state for generated responses and past inputs
+if 'generated' not in st.session_state:
+    st.session_state['generated'] = ['I am ready to help you update your Figma design']
 
-# Add argument parsing to allow for command-line input
-parser = argparse.ArgumentParser(description='Generate HTML/CSS code based on input.')
-parser.add_argument('input_text', type=str, help='The input text for generating code.')
-args = parser.parse_args()
+if 'past' not in st.session_state:
+    st.session_state['past'] = ['Hello']
 
-# Generate the code using the input argument
-response = generate_code(args.input_text)
+# Initialize current_html_content with the content of the original HTML file
+if 'current_html_content' not in st.session_state:
+    st.session_state['current_html_content'] = read_html_content(file_name)
 
-# Define the output file name
-file_name = "output.html"
+# Render the initial HTML content
+display = render_html(read_html_content(file_name))
 
-# Save the generated code to the output file
-with open(file_name, "w") as file:
-    file.write(response)
+# Get the user's input from the text input field
+user_input = get_text()
 
-print(f"HTML file saved as {file_name}")
+# If there is user input, search for a response and update the HTML content
+if user_input:
+    html_content = read_html_content(file_name)
+    output = generate_response(user_input, st.session_state['current_html_content'])
+    if is_valid_html_css_code(output):
+        # Update the chatbot with the new design 
+        st.session_state['current_html_content'] = output
+        # Write the updated HTML content to the file
+        write_html_content(output)
 
-# Open the HTML file in the default web browser
-webbrowser_open_successful = webbrowser.open(file_name)
-if webbrowser_open_successful:
-    print("HTML file opened successfully in the default web browser.")
-else:
-    print("Failed to open the HTML file in the default web browser.")
+        # Append the user input and generated output to the session state
+        st.session_state.past.append(user_input)
+        st.session_state.generated.append(output)
+
+        # Render the updated HTML content
+        render_html(output)
+
+# If there are generated responses, display the conversation using Streamlit messages
+if st.session_state['generated']:
+    for i in range(len(st.session_state['generated'])):
+        message(st.session_state['past'][i],
+                is_user=True, key=str(i) + '_user')
+        message(st.session_state["generated"][i], key=str(i))
 
 
