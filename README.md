@@ -37,16 +37,19 @@ This script generates HTML/CSS code based on a user-provided input and a Figma d
 
 ### chatbot.py
 
-This script provides a Streamlit-based chatbot interface for interactive code generation based on Figma designs.
+This is the chatbot code. 
 
-1. Navigate to the project directory.
-2. Start the Streamlit app: streamlit run chatbot.py
-3. Open a web browser and go to the URL displayed in the terminal (e.g., `http://localhost:8501`).
-4. Enter your input in the chat interface and receive generated HTML/CSS code.
-5. The generated code is rendered on the page and the conversation is displayed.
+1. Start the Streamlit app: streamlit run chatbot.py
+2. Enter your input in the chat interface and receive generated HTML/CSS code.
+3. The generated code is rendered on the page and the conversation is displayed.
+
+## Sponsers
+
+✨ Learn to build projects like this one (early bird discount): [BuildFast Course ](https://www.buildfastcourse.com/)
 
 ## License
 
 [MIT License](LICENSE)
+
 
 
