@@ -26,7 +26,7 @@ index = VectorstoreIndexCreator().from_loaders([figma_loader])
 figma_doc_retreiver = index.vectorstore.as_retriever()
 
 # Define system and human prompt templates
-system_prompt_template = """You are an expert coder and developer.
+system_prompt_template = """You are a senior developer.
 Use the provided design context to create idiomatic HTML/CSS code based on the user request.
 Everything must be inline in one file and your response must be directly renderable by the browser.
 Write code that matches the Figma file nodes and metadata as exactly as you can.
@@ -35,7 +35,7 @@ Figma file nodes and metadata: {context}"""
 human_prompt_template = "Code the {text}. Ensure that the code is mobile responsive and follows modern design principles."
 
 # Initialize the ChatOpenAI model
-gpt_4 = ChatOpenAI(temperature=.02, model_name='gpt-3.5-turbo', request_timeout=120)
+gpt_4 = ChatOpenAI(temperature=.03, model_name='gpt-3.5-turbo', request_timeout=120)
 
 # Define a function to generate code based on the input
 def generate_code(input):
@@ -69,8 +69,7 @@ file_name = "output.html"
 # Save the generated code to the output file
 with open(file_name, "w") as file:
     file.write(response)
-
-print(f"HTML file saved as {file_name}")
+    print(f"HTML file saved as {file_name}")
 
 # Open the HTML file in the default web browser
 webbrowser_open_successful = webbrowser.open(file_name)
@@ -78,4 +77,3 @@ if webbrowser_open_successful:
     print("HTML file opened successfully in the default web browser.")
 else:
     print("Failed to open the HTML file in the default web browser.")
-
