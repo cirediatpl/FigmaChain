@@ -43,9 +43,9 @@ This is the chatbot code.
 2. Enter your input in the chat interface and receive generated HTML/CSS code.
 3. The generated code is rendered on the page and the conversation is displayed.
 
-## Sponsers
+## Sponsors
 
-✨ Learn to build projects like this one (early bird discount): [BuildFast Course ](https://www.buildfastcourse.com/)
+✨ Learn to build projects like this one (with an early bird discount): [BuildFast Course](https://www.buildfastcourse.com/)
 
 ## License
 
