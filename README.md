@@ -21,7 +21,7 @@ To access the Figma RESTful API, you will need an access token, node IDs, and a 
 
 1. Clone the repository to your local machine.
 2. Navigate to the project directory.
-3. Install the required Python packages: pip install openai langchain streamlit dotenv
+3. Install the required Python packages: pip install openai langchain streamlit python-dotenv
 4. Create a `.env` file in the project directory and add the following environment variables: OPENAI_API_KEY, ACCESS_TOKEN, NODE_IDS, FILE_KEY
 
 ## Usage
